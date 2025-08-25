@@ -25,6 +25,15 @@
                 <div class="status-box" id="statusBox">
                     <span id="personName">Initializing...</span>
                 </div>
+                <!-- Feedback Controls -->
+                <div class="feedback-controls" id="feedbackControls" style="display: none;">
+                    <button class="feedback-btn correct" id="correctBtn" title="Recognition is correct">
+                        <i class="fas fa-thumbs-up"></i>
+                    </button>
+                    <button class="feedback-btn incorrect" id="incorrectBtn" title="Recognition is incorrect">
+                        <i class="fas fa-thumbs-down"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Camera Container -->
@@ -44,6 +53,10 @@
                     <label>Confidence:</label>
                     <span id="confidence">-</span>
                 </div>
+                <div class="info-item">
+                    <label>Learning Score:</label>
+                    <span id="learningScore">-</span>
+                </div>
             </div>
 
             <!-- Controls -->
@@ -55,6 +68,10 @@
                 <button class="btn btn-secondary" id="toggleCameraBtn">
                     <i class="fas fa-video"></i>
                     Toggle Camera
+                </button>
+                <button class="btn btn-info" id="learningStatsBtn">
+                    <i class="fas fa-chart-bar"></i>
+                    Learning Stats
                 </button>
             </div>
         </main>
@@ -80,6 +97,13 @@
                         <label for="expressionToggle">Show Expressions:</label>
                         <label class="toggle">
                             <input type="checkbox" id="expressionToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label for="adaptiveLearning">Adaptive Learning:</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="adaptiveLearning" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -116,6 +140,88 @@
                     <button class="btn btn-primary" id="saveFaceBtn">
                         <i class="fas fa-save"></i>
                         Save Face
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learning Stats Modal -->
+        <div class="modal" id="learningStatsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Learning Statistics</h3>
+                    <button class="close-btn" id="closeLearningStatsBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h4>Total Feedback</h4>
+                            <span id="totalFeedback" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Correct Predictions</h4>
+                            <span id="correctPredictions" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Accuracy Rate</h4>
+                            <span id="accuracyRate" class="stat-value">-</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Current Threshold</h4>
+                            <span id="currentThreshold" class="stat-value">0.6</span>
+                        </div>
+                    </div>
+                    <div class="learning-chart">
+                        <h4>Recent Learning Progress</h4>
+                        <canvas id="learningChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="feedback-history">
+                        <h4>Recent Feedback</h4>
+                        <div id="feedbackList" class="feedback-list"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="exportDataBtn">
+                        <i class="fas fa-download"></i>
+                        Export Data
+                    </button>
+                    <button class="btn btn-warning" id="resetLearningBtn">
+                        <i class="fas fa-refresh"></i>
+                        Reset Learning
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Correction Modal -->
+        <div class="modal" id="feedbackModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Correct Recognition</h3>
+                    <button class="close-btn" id="closeFeedbackBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Who is this person?</p>
+                    <div class="face-preview">
+                        <canvas id="feedbackCanvas"></canvas>
+                    </div>
+                    <div class="input-group">
+                        <label for="correctNameInput">Correct Name:</label>
+                        <select id="correctNameSelect">
+                            <option value="">Select correct person...</option>
+                        </select>
+                        <input type="text" id="correctNameInput" placeholder="Or enter new name..." maxlength="30">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelFeedbackBtn">Cancel</button>
+                    <button class="btn btn-primary" id="submitFeedbackBtn">
+                        <i class="fas fa-check"></i>
+                        Submit Correction
                     </button>
                 </div>
             </div>

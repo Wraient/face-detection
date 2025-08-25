@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Detection System</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-camera"></i> Face Detection System</h1>
+            <button class="settings-btn" id="settingsBtn">
+                <i class="fas fa-cog"></i>
+            </button>
+        </header>
+
+        <main>
+            <!-- Recognition Status -->
+            <div class="status-container">
+                <div class="status-box" id="statusBox">
+                    <span id="personName">Initializing...</span>
+                </div>
+            </div>
+
+            <!-- Camera Container -->
+            <div class="camera-container">
+                <video id="video" autoplay muted playsinline></video>
+                <canvas id="overlay"></canvas>
+                <div class="camera-border"></div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="info-panel">
+                <div class="info-item">
+                    <label>Expression:</label>
+                    <span id="expression">-</span>
+                </div>
+                <div class="info-item">
+                    <label>Confidence:</label>
+                    <span id="confidence">-</span>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button class="btn btn-primary" id="addFaceBtn">
+                    <i class="fas fa-plus"></i>
+                    Add New Face
+                </button>
+                <button class="btn btn-secondary" id="toggleCameraBtn">
+                    <i class="fas fa-video"></i>
+                    Toggle Camera
+                </button>
+            </div>
+        </main>
+
+        <!-- Settings Modal -->
+        <div class="modal" id="settingsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Settings</h3>
+                    <button class="close-btn" id="closeSettingsBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-item">
+                        <label for="confidenceSlider">Recognition Confidence:</label>
+                        <div class="slider-container">
+                            <input type="range" id="confidenceSlider" min="0.3" max="0.9" step="0.05" value="0.6">
+                            <span id="confidenceValue">0.6</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label for="expressionToggle">Show Expressions:</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="expressionToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="resetDataBtn">
+                        <i class="fas fa-trash"></i>
+                        Clear Database
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Face Modal -->
+        <div class="modal" id="addFaceModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New Face</h3>
+                    <button class="close-btn" id="closeAddFaceBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="face-preview">
+                        <canvas id="faceCanvas"></canvas>
+                    </div>
+                    <div class="input-group">
+                        <label for="personNameInput">Person's Name:</label>
+                        <input type="text" id="personNameInput" placeholder="Enter name..." maxlength="30">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelAddFaceBtn">Cancel</button>
+                    <button class="btn btn-primary" id="saveFaceBtn">
+                        <i class="fas fa-save"></i>
+                        Save Face
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p>Loading face detection models...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

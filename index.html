@@ -172,6 +172,14 @@
                             <h4>Current Threshold</h4>
                             <span id="currentThreshold" class="stat-value">0.6</span>
                         </div>
+                        <div class="stat-card emotion-stats">
+                            <h4>Emotion Feedback</h4>
+                            <span id="emotionFeedback" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-card emotion-stats">
+                            <h4>Emotion Accuracy</h4>
+                            <span id="emotionAccuracy" class="stat-value">-</span>
+                        </div>
                     </div>
                     <div class="learning-chart">
                         <h4>Recent Learning Progress</h4>
@@ -205,16 +213,46 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>Who is this person?</p>
-                    <div class="face-preview">
-                        <canvas id="feedbackCanvas"></canvas>
+                    <div class="correction-section">
+                        <h4><i class="fas fa-user"></i> Person Recognition</h4>
+                        <p>Who is this person?</p>
+                        <div class="face-preview">
+                            <canvas id="feedbackCanvas"></canvas>
+                        </div>
+                        <div class="input-group">
+                            <label for="correctNameInput">Correct Name:</label>
+                            <select id="correctNameSelect">
+                                <option value="">Select correct person...</option>
+                            </select>
+                            <input type="text" id="correctNameInput" placeholder="Or enter new name..." maxlength="30">
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="correctNameInput">Correct Name:</label>
-                        <select id="correctNameSelect">
-                            <option value="">Select correct person...</option>
-                        </select>
-                        <input type="text" id="correctNameInput" placeholder="Or enter new name..." maxlength="30">
+                    
+                    <div class="correction-section">
+                        <h4><i class="fas fa-smile"></i> Emotion Recognition</h4>
+                        <div class="emotion-feedback">
+                            <p>Detected emotion: <strong id="detectedEmotion">-</strong></p>
+                            <div class="input-group">
+                                <label for="correctEmotionSelect">What's the correct emotion?</label>
+                                <select id="correctEmotionSelect">
+                                    <option value="">Select correct emotion...</option>
+                                    <option value="happy">😊 Happy</option>
+                                    <option value="sad">😢 Sad</option>
+                                    <option value="angry">😠 Angry</option>
+                                    <option value="surprised">😲 Surprised</option>
+                                    <option value="fearful">😨 Fearful</option>
+                                    <option value="disgusted">🤢 Disgusted</option>
+                                    <option value="neutral">😐 Neutral</option>
+                                </select>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="skipEmotionCorrection">
+                                    <span class="checkmark"></span>
+                                    Emotion detection was correct
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

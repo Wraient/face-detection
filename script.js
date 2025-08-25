@@ -27,6 +27,7 @@ class FaceDetectionSystem {
         this.detectionConfidence = 0;
         this.lastRecognitionResult = null;
         this.pendingFeedback = null;
+        this.currentDetectedEmotion = null;
 
         // Elements
         this.elements = {};
@@ -65,7 +66,16 @@ class FaceDetectionSystem {
             adaptiveLearningToggle: document.getElementById('adaptiveLearning'),
             personNameInput: document.getElementById('personNameInput'),
             correctNameSelect: document.getElementById('correctNameSelect'),
-            correctNameInput: document.getElementById('correctNameInput')
+            correctNameInput: document.getElementById('correctNameInput'),
+            detectedEmotion: document.getElementById('detectedEmotion'),
+            correctEmotionSelect: document.getElementById('correctEmotionSelect'),
+            skipEmotionCorrection: document.getElementById('skipEmotionCorrection'),
+            totalFeedback: document.getElementById('totalFeedback'),
+            correctPredictions: document.getElementById('correctPredictions'),
+            accuracyRate: document.getElementById('accuracyRate'),
+            currentThreshold: document.getElementById('currentThreshold'),
+            emotionFeedback: document.getElementById('emotionFeedback'),
+            emotionAccuracy: document.getElementById('emotionAccuracy')
         };
 
         this.video = this.elements.video;
@@ -462,6 +472,9 @@ class FaceDetectionSystem {
         // Populate name options
         this.populateNameOptions();
 
+        // Populate emotion information
+        this.populateEmotionCorrection();
+
         this.showModal('feedbackModal');
     }
 
@@ -510,6 +523,19 @@ class FaceDetectionSystem {
         });
     }
 
+    populateEmotionCorrection() {
+        // Display current detected emotion
+        const detectedEmotion = this.currentExpression ? this.currentExpression.expression : 'neutral';
+        document.getElementById('detectedEmotion').textContent = detectedEmotion.charAt(0).toUpperCase() + detectedEmotion.slice(1);
+        
+        // Reset emotion correction fields
+        document.getElementById('correctEmotionSelect').value = '';
+        document.getElementById('skipEmotionCorrection').checked = false;
+        
+        // Store current emotion for feedback
+        this.currentDetectedEmotion = detectedEmotion;
+    }
+
     submitCorrection() {
         const selectedName = this.elements.correctNameSelect.value;
         const inputName = this.elements.correctNameInput.value.trim();
@@ -525,8 +551,11 @@ class FaceDetectionSystem {
             return;
         }
 
-        // Record the correction
+        // Record the face recognition correction
         this.recordFeedback('incorrect', this.lastRecognitionResult.predicted, correctName);
+
+        // Handle emotion correction
+        this.handleEmotionFeedback();
 
         // If it's a new name, add to database
         if (inputName && !this.faceDatabase.find(p => p.name.toLowerCase() === inputName.toLowerCase())) {
@@ -546,6 +575,38 @@ class FaceDetectionSystem {
         // Clear inputs
         this.elements.correctNameSelect.value = '';
         this.elements.correctNameInput.value = '';
+    }
+
+    handleEmotionFeedback() {
+        const skipEmotionCorrection = this.elements.skipEmotionCorrection.checked;
+        const correctEmotion = this.elements.correctEmotionSelect.value;
+        
+        if (skipEmotionCorrection) {
+            // Record that emotion detection was correct
+            this.recordEmotionFeedback('correct', this.currentDetectedEmotion, this.currentDetectedEmotion);
+        } else if (correctEmotion) {
+            // Record emotion correction
+            this.recordEmotionFeedback('incorrect', this.currentDetectedEmotion, correctEmotion);
+        }
+        // If neither option is selected, no emotion feedback is recorded
+    }
+
+    recordEmotionFeedback(type, predictedEmotion, actualEmotion) {
+        const emotionFeedback = {
+            id: Date.now().toString() + '_emotion',
+            type: 'emotion_' + type,
+            predictedEmotion: predictedEmotion,
+            actualEmotion: actualEmotion,
+            confidence: this.currentExpression?.confidence || 0,
+            timestamp: Date.now(),
+            dateTime: new Date().toLocaleString()
+        };
+
+        this.feedbackDatabase.push(emotionFeedback);
+        this.updateLearningStats(emotionFeedback);
+        this.saveFeedbackDatabase();
+
+        console.log(`Emotion feedback recorded: ${predictedEmotion} → ${actualEmotion} (${type})`);
     }
 
     recordFeedback(type, predicted, actual) {
@@ -572,8 +633,26 @@ class FaceDetectionSystem {
     updateLearningStats(feedback) {
         this.learningStats.totalFeedback++;
 
-        if (feedback.type === 'correct') {
+        if (feedback.type === 'correct' || feedback.type === 'emotion_correct') {
             this.learningStats.correctPredictions++;
+        }
+
+        // Track emotion-specific stats
+        if (feedback.type === 'emotion_correct' || feedback.type === 'emotion_incorrect') {
+            if (!this.learningStats.emotionStats) {
+                this.learningStats.emotionStats = {
+                    total: 0,
+                    correct: 0,
+                    accuracy: 0
+                };
+            }
+            
+            this.learningStats.emotionStats.total++;
+            if (feedback.type === 'emotion_correct') {
+                this.learningStats.emotionStats.correct++;
+            }
+            this.learningStats.emotionStats.accuracy = 
+                this.learningStats.emotionStats.correct / this.learningStats.emotionStats.total;
         }
 
         this.learningStats.accuracy = this.learningStats.correctPredictions / this.learningStats.totalFeedback;
@@ -631,6 +710,17 @@ class FaceDetectionSystem {
         const accuracy = this.calculateAccuracy();
         document.getElementById('accuracyRate').textContent = accuracy >= 0 ? `${Math.round(accuracy * 100)}%` : '-';
         document.getElementById('currentThreshold').textContent = this.confidenceThreshold.toFixed(2);
+        
+        // Update emotion statistics
+        const emotionStats = this.learningStats.emotionStats;
+        if (emotionStats) {
+            document.getElementById('emotionFeedback').textContent = emotionStats.total;
+            const emotionAccuracy = emotionStats.accuracy >= 0 ? `${Math.round(emotionStats.accuracy * 100)}%` : '-';
+            document.getElementById('emotionAccuracy').textContent = emotionAccuracy;
+        } else {
+            document.getElementById('emotionFeedback').textContent = '0';
+            document.getElementById('emotionAccuracy').textContent = '-';
+        }
     }
 
     drawLearningChart() {
@@ -716,10 +806,21 @@ class FaceDetectionSystem {
             const item = document.createElement('div');
             item.className = `feedback-item ${feedback.type}`;
 
-            const isCorrect = feedback.type === 'correct';
-            const text = isCorrect
-                ? `Correctly identified as ${feedback.predicted}`
-                : `Corrected from "${feedback.predicted}" to "${feedback.actual}"`;
+            let text, icon;
+            
+            if (feedback.type === 'emotion_correct') {
+                text = `Emotion correctly detected as ${feedback.predictedEmotion}`;
+                icon = 'fa-smile';
+            } else if (feedback.type === 'emotion_incorrect') {
+                text = `Emotion corrected from "${feedback.predictedEmotion}" to "${feedback.actualEmotion}"`;
+                icon = 'fa-frown';
+            } else {
+                const isCorrect = feedback.type === 'correct';
+                text = isCorrect
+                    ? `Correctly identified as ${feedback.predicted}`
+                    : `Corrected from "${feedback.predicted}" to "${feedback.actual}"`;
+                icon = `fa-thumbs-${isCorrect ? 'up' : 'down'}`;
+            }
 
             item.innerHTML = `
                 <div class="feedback-details">
@@ -727,7 +828,7 @@ class FaceDetectionSystem {
                     <div class="feedback-time">${feedback.dateTime}</div>
                 </div>
                 <div class="feedback-icon ${feedback.type}">
-                    <i class="fas fa-thumbs-${isCorrect ? 'up' : 'down'}"></i>
+                    <i class="fas ${icon}"></i>
                 </div>
             `;
 

@@ -519,6 +519,88 @@ body {
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
 
+    /* Feedback Modal Specific */
+    .correction-section {
+        margin-bottom: 30px;
+        padding-bottom: 25px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .correction-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .correction-section h4 {
+        color: #333;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .correction-section h4 i {
+        color: #007bff;
+    }
+
+    .emotion-feedback {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+    }
+
+    .emotion-feedback p {
+        margin-bottom: 15px;
+        color: #666;
+    }
+
+    .emotion-feedback strong {
+        color: #007bff;
+        text-transform: capitalize;
+    }
+
+    .checkbox-group {
+        margin-top: 15px;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 0.95rem;
+        color: #666;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        margin-right: 10px;
+        transform: scale(1.1);
+    }
+
+    .checkbox-label:hover {
+        color: #333;
+    }
+
+    /* Select styling */
+    select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        font-size: 1rem;
+        background: white;
+        transition: border-color 0.3s ease;
+    }
+
+    select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
     /* Loading Overlay */
     .loading-overlay {
         position: fixed;
@@ -755,4 +837,13 @@ body {
         outline: none;
         border-color: #007bff;
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    /* Emotion Stats Specific */
+    .emotion-stats {
+        border-left: 4px solid #ff9800;
+    }
+
+    .emotion-stats h4 {
+        color: #ff9800;
     }
